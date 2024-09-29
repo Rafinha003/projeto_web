@@ -1,5 +1,5 @@
 html, body{
-    height: 100%;
+    
     background: linear-gradient(135deg, #00aaff, #00ff6a);
     scroll-behavior: smooth;
 }
@@ -7,6 +7,8 @@ html, body{
 .sidebar{
     min-height: 100%;
     height: 100vh;
+    position: fixed;
+    
 }
 
 .center-content{
@@ -125,3 +127,51 @@ html, body{
  .input-group .form-control {
     border-left: 0;
  }
+
+ .profile-content{
+    margin-left: 300px !important;
+    
+ }
+
+ .profile-header {
+    margin: 50px 0;
+}
+.profile-header img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+}
+.profile-header h2 {
+    margin-top: 20px;
+    font-weight: bold;
+}
+.profile-header p {
+    color: #888;
+}
+.profile-stats {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+.profile-stats div {
+    text-align: center;
+}
+.profile-stats div span {
+    font-size: 20px;
+    font-weight: bold;
+}
+.profile-stats div p {
+    margin: 0;
+    color: #888;
+}
+.edit-profile-btn {
+    margin-top: 20px;
+}
+.post-gallery {
+    margin-top: 50px;
+}
+.post-gallery img {
+    width: 100%;
+    height: auto;
+    margin: 1px;
+}
