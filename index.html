@@ -7,89 +7,190 @@
     <link rel="stylesheet" href="bootstrap-5.3.3-dist/bootstrap-5.3.3-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="bootstrap-icons-1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .post-img {
+            width: 600px;
+            height: 400px;
+            object-fit: contain;
+        }
+    </style>
 </head>
 <body>
 
   <!--SIDEBAR-->
   <div class="d-flex flex-nowrap">
     <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark sidebar" style="width: 280px;">
-        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <a href="index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
           <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
           <span class="fs-4">CarsGram</span>
         </a>
         <hr>
         
-          <!--Menu de Navegação-->        
-          <ul class="nav nav-pills flex-column mb-auto">
+        <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-              <a href="index.html" class="nav-link active" aria-current="page">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
-                Pagina Inicial
-              </a>
+                <a href="index.html" class="nav-link active" aria-current="page">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+                    Pagina Inicial
+                </a>
             </li>
             <li>
-              <a href="perfil.html" class="nav-link text-white">
-                <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
-                Perfil
-              </a>
+                <a href="perfil.html" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+                    Perfil
+                </a>
             </li>
-          </ul>
+        </ul>
         <hr>
 
         <!--Dropdown Perfil-->
         <div class="dropdown">
-          <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="" alt="" width="32" height="32" class="rounded-circle me-2">
-            <strong>Perfil</strong>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-            <li><a class="dropdown-item" href="#">Nova publicação</a></li>
-            <li><a class="dropdown-item" href="perfil.html">Perfil</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Sair</a></li>
-          </ul>
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="" alt="" width="32" height="32" class="rounded-circle me-2">
+                <strong>Perfil</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                <li><a class="dropdown-item" href="perfil.html">Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="login.html.php">Sign out</a></li>
+            </ul>
         </div>
-        </div>
-
-
-      <!--POSTS-->  
-      <div class="d-grid gap-2 col-6 mx-auto center-content">
-        <button class="btn btn-primary btn-publi" type="button">Criar publicação</button>
-        <div class="post">
-          <div class="post-header">
-              <img src="https://via.placeholder.com/40" alt="Profile picture">
-              <strong>Usuário</strong>
-          </div>
-          
-          <img src="https://via.placeholder.com/600x400" alt="Post image" class="post-img">
-
-          <div class="post-actions d-flex justify-content-between">
-              <div>
-                  <button class="btn btn-outline-danger"><i class="bi bi-heart"></i></button>
-                  <button class="btn btn-outline-primary"><i class="bi bi-chat"></i></button>
-                  <button class="btn btn-outline-dark"><i class="bi bi-send"></i></button>
-              </div>
-              <div>
-                  <button class="btn btn-outline-warning"><i class="bi bi-bookmark"></i></button>
-              </div>
-          </div>
-      
-          <div class="post-caption">
-              <strong>usuario</strong> Essa é uma legenda de exemplo para a publicação.
-          </div>
-      
-          <div class="comment-section">
-              <textarea rows="1" placeholder="Adicione um comentário..."></textarea>
-          </div>
-      </div>
-      </div>
-
-      
-      
-
     </div>
 
-  </div>
+    <!--POSTS-->  
+    <div class="d-grid gap-2 col-6 mx-auto center-content">
+        <button class="btn btn-primary btn-publi" type="button" data-bs-toggle="modal" data-bs-target="#modalPubli">Criar publicação</button>
+        <div id="postContainer"></div> <!-- Container para os posts -->
+    </div>
+
+    <div class="modal fade" id="modalPubli" tabindex="-1" aria-labelledby="modalPubliLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPubliLabel" style="font-size: 1.5rem;">Criar publicação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="publiForm">
+                        <div class="mb-4">
+                            <label for="imagem" class="form-label" style="font-size: 1.2rem;">Carregar Imagem *</label>
+                            <input
+                                type="file"
+                                class="form-control form-control-lg"
+                                id="imagem"
+                                accept="image/*"
+                                onchange="previewImage(event); checkButtonState();"
+                            />
+                            <div class="mt-2" style="font-size: 0.9rem; color: gray;">
+                                (Apenas arquivos de imagem, até 5MB)
+                            </div>
+                            <div class="d-flex justify-content-center mt-3">
+                                <img id="imagePreview" src="" alt="Preview" class="img-fluid" style="display: none; width: 600px; height: 400px; object-fit: contain;" />
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="conteudo" class="form-label" style="font-size: 1.2rem;">Descrição da postagem *</label>
+                            <textarea class="form-control form-control-lg" id="conteudo" rows="3" placeholder="Escreva sua publicação" oninput="checkButtonState();"></textarea>
+                        </div>
+                    </form>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-primary btn-lg" id="btnPublicar" style="margin: 15px;" disabled>Publicar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function loadPosts() {
+            const posts = JSON.parse(localStorage.getItem('posts')) || [];
+            const postContainer = document.getElementById('postContainer');
+
+            // Limpar posts existentes
+            postContainer.innerHTML = '';
+
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.classList.add('post');
+
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <img src="https://via.placeholder.com/40" alt="Profile picture">
+                        <strong>username</strong>
+                    </div>
+                    <img src="${post.imagem}" alt="Post image" class="post-img">
+                    <div class="post-actions d-flex justify-content-between">
+                        <div>
+                            <button class="btn btn-outline-danger"><i class="bi bi-heart"></i></button>
+                            <button class="btn btn-outline-primary"><i class="bi bi-chat"></i></button>
+                            <button class="btn btn-outline-dark"><i class="bi bi-send"></i></button>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-warning"><i class="bi bi-bookmark"></i></button>
+                        </div>
+                    </div>
+                    <div class="post-caption">
+                        <strong>username</strong> ${post.conteudo}
+                    </div>
+                    <div class="comment-section">
+                        <textarea rows="1" placeholder="Adicione um comentário..."></textarea>
+                    </div>
+                `;
+
+                postContainer.appendChild(postElement);
+            });
+        }
+
+        function previewImage(event) {
+            const input = event.target;
+            const imagePreview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    
+        function checkButtonState() {
+            const imagemInput = document.getElementById('imagem').files.length > 0;
+            const conteudoInput = document.getElementById('conteudo').value.trim().length > 0;
+            const btnPublicar = document.getElementById('btnPublicar');
+            btnPublicar.disabled = !(imagemInput && conteudoInput);
+        }
+
+        document.getElementById('btnPublicar').addEventListener('click', function() {
+            const imagemInput = document.getElementById('imagem').files[0];
+            const conteudoInput = document.getElementById('conteudo').value.trim();
+
+            if (imagemInput && conteudoInput) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const posts = JSON.parse(localStorage.getItem('posts')) || [];
+                    posts.push({ imagem: e.target.result, conteudo: conteudoInput }); // Adicionar nova postagem
+                    localStorage.setItem('posts', JSON.stringify(posts)); // Armazenar todas as postagens
+
+                    loadPosts(); // Atualiza a lista de posts
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalPubli'));
+                    modal.hide(); // Fecha o modal
+                };
+                reader.readAsDataURL(imagemInput);
+            }
+        });
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            loadPosts(); // Carrega posts ao inicializar a página
+            const modal = document.getElementById('modalPubli');
+            modal.addEventListener('hidden.bs.modal', function () {
+                document.getElementById('publiForm').reset();
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = '';
+                imagePreview.style.display = 'none';
+                checkButtonState();
+            });
+        });
+    </script>
   
     <script src="bootstrap-5.3.3-dist/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -3,29 +3,14 @@ session_start();
 
 class Login {
     public function autenticarUsuario($login, $senha) {
-        if (isset($_SESSION['usuarios'])) {
-            foreach ($_SESSION['usuarios'] as $usuario) {
-                if (($usuario['username'] === $login || $usuario['email'] === $login) && 
-                    password_verify($senha, $usuario['senha'])) {
-                    $_SESSION['usuario_logado'] = $usuario;
-                    header("Location: index.html");
-                    exit();
-                }
-            }
-        }
-
-        // Usuário de teste
         $usuarioTeste = [
             'username' => 'admin',
             'email' => 'admin@example.com',
             'senha' => password_hash('123', PASSWORD_DEFAULT)
         ];
-
         if (($usuarioTeste['username'] === $login || $usuarioTeste['email'] === $login) &&
             password_verify($senha, $usuarioTeste['senha'])) {
-            $_SESSION['usuario_logado'] = $usuarioTeste;
-            header("Location: index.html");
-            exit();
+            return json_encode($usuarioTeste);
         }
 
         return false; 
@@ -41,7 +26,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $loginValue = $login;
 
     $loginClass = new Login();
-    if (!$loginClass->autenticarUsuario($login, $senha)) {
+    $usuario = $loginClass->autenticarUsuario($login, $senha);
+    if ($usuario) {
+        echo "<script>
+                sessionStorage.setItem('usuario_logado', '$usuario');
+                window.location.href = 'index.html';
+              </script>";
+        exit();
+    } else {
         $error = "Usuário ou senha inválidos!";
     }
 }
