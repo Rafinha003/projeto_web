@@ -66,7 +66,7 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
     <div class="container profile-content">
         <div class="profile-header text-center">
             <img src="<?= $usuarioLogado->imagem_perfil ? $usuarioLogado->imagem_perfil : 'https://via.placeholder.com/150' ?>"
-                alt="Foto do Perfil">
+                alt="Foto do Perfil" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
             <h2 id="nomeUsuario">Nome</h2>
             <p id="bioUsuario">Bio do usuário.</p>
 
@@ -150,7 +150,6 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                                 <h5>Comentários:</h5>
                                 <button type="button" class="btn btn-danger" id="btnDeletarPost"
                                     style="display: none; height: 38px; margin-top: -5px;">
-                                    <!-- Ajuste de altura e margem -->
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -210,17 +209,13 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
             let usuarioLogado;
 
             document.addEventListener('DOMContentLoaded', function () {
-                // Carregar dados do sessionStorage
                 usuarioLogado = JSON.parse(sessionStorage.getItem('usuario_logado'));
-
-                // Esconder o botão "Editar Perfil" se estiver visualizando um perfil externo
                 const btnEditarPerfil = document.getElementById('btnEditarPerfil');
                 if (perfilExterno && btnEditarPerfil) {
                     btnEditarPerfil.style.display = 'none';
                 }
 
                 if (typeof usuarioPerfil !== 'undefined' && perfilExterno) {
-                    // Atualizar para perfil externo
                     atualizarPerfilNaPagina(usuarioPerfil);
 
                     if (typeof postCount !== 'undefined') {
@@ -231,7 +226,6 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                         carregarGaleriaDePosts(posts);
                     }
                 } else if (usuarioLogado) {
-                    // Atualizar para o próprio perfil
                     atualizarPerfilNaPagina(usuarioLogado);
 
                     if (typeof postCount !== 'undefined') {
@@ -243,11 +237,9 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                     }
                 }
 
-                // Configurar eventos
                 configurarEventos();
             });
 
-            // Atualiza o perfil no DOM
             function atualizarPerfilNaPagina(usuario) {
                 document.getElementById('nomeUsuario').textContent = usuario.nome || 'Usuário sem nome';
                 document.getElementById('bioUsuario').textContent = usuario.bio || 'Nenhuma bio disponível.';
@@ -258,7 +250,6 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                 }
             }
 
-            // Configura eventos globais da página
             function configurarEventos() {
                 if (!perfilExterno) {
                     document.getElementById('salvarAlteracoes').addEventListener('click', function () {
@@ -269,7 +260,6 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                 }
             }
 
-            // Salvar alterações do perfil
             function salvarAlteracoesPerfil() {
                 const nome = document.getElementById('nome').value;
                 const bio = document.getElementById('bio').value;
@@ -282,7 +272,7 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                     formData.append('imagem_perfil', imagemPerfil);
                 }
 
-                fetch('atualizar_perfil.php', {
+                fetch('serviços/perfil/atualizar_perfil.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -313,7 +303,6 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                     .catch(error => console.error('Erro ao atualizar perfil:', error));
             }
 
-            // Carregar galeria de posts
             function carregarGaleriaDePosts(posts) {
                 const postGallery = document.getElementById('postGallery');
                 posts.forEach(post => {
@@ -327,7 +316,6 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                 });
             }
 
-            // Abrir modal de post
             function openModal(postId, imagem, conteudo, postUsuarioId) {
                 const modalImagem = new bootstrap.Modal(document.getElementById('modalImagem'));
                 const imagemMaior = document.getElementById('imagemMaior');
@@ -340,8 +328,7 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                 descricaoPost.innerHTML = `<p>${conteudo}</p>`;
                 listaComentarios.innerHTML = '';
 
-                // Carregar comentários
-                fetch('carregar_comentarios.php', {
+                fetch('serviços/comentarios/carregar_comentarios.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `postId=${postId}`
@@ -354,14 +341,11 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
 
                 modalImagem.show();
 
-                // Mostrar botão de deletar apenas para o dono do post
                 btnDeletarPost.style.display = usuarioLogado.id === postUsuarioId ? 'block' : 'none';
 
-                // Adicionar eventos ao modal
                 configurarModalEventos(postId, imagem, conteudo, postUsuarioId);
             }
 
-            // Configurar eventos para ações do modal
             function configurarModalEventos(postId, imagem, conteudo, postUsuarioId) {
                 document.getElementById('btnAdicionarComentario').onclick = function () {
                     adicionarComentario(postId, imagem, conteudo, postUsuarioId);
@@ -372,11 +356,10 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                 };
             }
 
-            // Adicionar comentário
             function adicionarComentario(postId, imagem, conteudo, postUsuarioId) {
                 const comentario = document.getElementById('novoComentario').value.trim();
                 if (comentario) {
-                    fetch('adicionar_comentario.php', {
+                    fetch('serviços/comentarios/adicionar_comentario.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: `post_id=${postId}&content=${encodeURIComponent(comentario)}`
@@ -384,6 +367,7 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                         .then(response => {
                             if (response.ok) {
                                 document.getElementById('novoComentario').value = '';
+                                location.reload();
                                 openModal(postId, imagem, conteudo, postUsuarioId);
                             } else {
                                 alert('Erro ao adicionar comentário.');
@@ -393,7 +377,6 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                 }
             }
 
-            // Confirmar deleção de post
             function confirmarDeletarPost(postId) {
                 const modalConfirmacaoDelete = new bootstrap.Modal(document.getElementById('modalConfirmacaoDelete'));
                 modalConfirmacaoDelete.show();
@@ -403,9 +386,61 @@ echo "<script>var usuarioPerfil = " . json_encode($usuarioPerfil) . ";</script>"
                 };
             }
 
-            // Deletar post
+            function abrirModalEditarComentario(comentarioId, conteudoAtual) {
+                const modalEditarComentario = new bootstrap.Modal(document.getElementById('modalEditarComentario'));
+                modalEditarComentario.show();
+
+                document.getElementById('novoConteudoComentario').value = conteudoAtual;
+                document.getElementById('salvarEdicaoComentario').onclick = function () {
+                    const novoConteudo = document.getElementById('novoConteudoComentario').value.trim();
+
+                    if (novoConteudo) {
+                        fetch('serviços/comentarios/editar_comentario.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `comentario_id=${comentarioId}&novo_texto=${encodeURIComponent(novoConteudo)}`
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Comentário atualizado com sucesso!');
+                                    modalEditarComentario.hide();
+                                    location.reload();
+                                } else {
+                                    alert(data.message || 'Erro ao atualizar o comentário.');
+                                }
+                            })
+                            .catch(error => console.error('Erro ao atualizar o comentário:', error));
+                    } else {
+                        alert('O conteúdo do comentário não pode estar vazio.');
+                    }
+                };
+            }
+
+            function abrirModalDeletarComentario(comentarioId) {
+                const modalConfirmacaoDelete = new bootstrap.Modal(document.getElementById('modalConfirmacaoDelete'));
+                modalConfirmacaoDelete.show();
+
+                document.getElementById('confirmarDeletar').onclick = function () {
+                    fetch('serviços/comentarios/deletar_comentario.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `comentario_id=${comentarioId}`
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload();
+                            } else {
+                                alert(data.message || 'Erro ao deletar o comentário.');
+                            }
+                        })
+                        .catch(error => console.error('Erro ao deletar comentário:', error));
+                };
+            }
+
             function deletarPost(postId) {
-                fetch('deletar_post.php', {
+                fetch('serviços/posts/deletar_post.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `post_id=${postId}`
