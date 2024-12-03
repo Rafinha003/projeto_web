@@ -67,9 +67,9 @@ if ($posts === false) {
     <?php include('barra-lateral.php'); ?>
 
     <!-- POSTS -->
-    <div class="d-grid gap-2 col-6 mx-auto center-content">
-        <button class="btn btn-primary btn-publi" type="button" data-bs-toggle="modal"
-            data-bs-target="#modalPubli">Criar publicação</button>
+    <div class="d-grid gap-2 col-6 center-content" style="margin-left: 620px;">
+        <button class="btn btn-primary btn-publi" type="button" data-bs-toggle="modal" data-bs-target="#modalPubli"
+            style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 8px;">Criar publicação</button>
         <div id="postContainer">
             <?php if (!empty($posts)): ?>
                 <?php foreach ($posts as $post): ?>
@@ -81,7 +81,7 @@ if ($posts === false) {
                     $nomeUsuario = $user['nome'];
                     $imagemPerfil = $user['imagem_perfil'];
                     ?>
-                    <div class="post">
+                    <div class="post" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 8px;">
                         <div class="post-header">
                             <img src="<?= !empty($imagemPerfil) ? $imagemPerfil : 'https://via.placeholder.com/40'; ?>"
                                 alt="Profile picture" class="profile-img">
@@ -133,7 +133,7 @@ if ($posts === false) {
                                     <p>Não há comentários para exibir.</p>
                                 <?php endif; ?>
                             </div>
-                            <form method="POST" action="adicionar_comentario.php">
+                            <form onsubmit="adicionarComentario(event, <?= $post['id']; ?>)" id="form_<?= $post['id']; ?>">
                                 <input type="hidden" name="post_id" value="<?= $post['id']; ?>">
                                 <textarea name="content" rows="1" placeholder="Adicione um comentário..." required></textarea>
                                 <button type="submit" class="btn btn-primary">Comentar</button>
@@ -223,6 +223,46 @@ if ($posts === false) {
         </div>
     </div>
 
+    <!-- Modal de edição de comentário -->
+    <div class="modal fade" id="modalEditarComentario" tabindex="-1" aria-labelledby="modalEditarComentarioLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarComentarioLabel">Editar Comentário</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" id="novoConteudoComentario" rows="4"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="salvarEdicaoComentario">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação de exclusão -->
+    <div class="modal fade" id="modalConfirmacaoDelete" tabindex="-1" aria-labelledby="modalConfirmacaoDeleteLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalConfirmacaoDeleteLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Tem certeza de que deseja deletar o post?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+                    <button type="button" class="btn btn-danger" id="confirmarDeletar">Sim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function previewImage(event) {
             const input = event.target;
@@ -245,7 +285,7 @@ if ($posts === false) {
         }
 
         function curtirPost(postId) {
-            const url = 'curtir_post.php';
+            const url = 'serviços/posts/curtir_post.php';
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
@@ -264,43 +304,118 @@ if ($posts === false) {
             const modalDescription = document.getElementById('descricaoPost');
             const modalComments = document.getElementById('listaComentarios');
 
-            // Atualizar imagem e descrição no modal
             modalImage.src = imageUrl;
             modalDescription.textContent = description;
 
-            // Limpar comentários antigos
             modalComments.innerHTML = '';
 
-            // Carregar comentários do post
-            fetch('carregar_comentarios.php', {
+            fetch('serviços/comentarios/carregar_comentarios.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `postId=${postId}` // Corrigido: `post_id` para `postId` conforme esperado pelo PHP
+                body: `postId=${postId}`
             })
-                .then(response => response.text()) // PHP retorna HTML e não JSON
+                .then(response => response.text())
                 .then(html => {
-                    modalComments.innerHTML = html; // Atualiza diretamente o HTML
+                    modalComments.innerHTML = html;
                 })
                 .catch(error => {
                     console.error('Erro ao carregar comentários:', error);
                     modalComments.innerHTML = '<p>Erro ao carregar comentários.</p>';
                 });
 
-            // Configurar botão para adicionar comentário
             const addCommentButton = document.getElementById('btnAdicionarComentario');
             addCommentButton.onclick = function () {
                 addComment(postId);
             };
 
-            // Mostrar modal
             const modal = new bootstrap.Modal(document.getElementById('modalImagem'));
             modal.show();
+        }
+
+        function adicionarComentario(event, postId) {
+            event.preventDefault();
+
+            const form = document.getElementById('form_' + postId);
+            const formData = new FormData(form);
+
+            fetch('serviços/comentarios/adicionar_comentario.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const commentSection = document.getElementById('post_' + postId).querySelector('.existing-comments');
+                        const novoComentario = `<p><strong>Você:</strong> ${formData.get('content')}</p>`;
+                        commentSection.innerHTML += novoComentario;
+
+                        location.reload();
+                        form.querySelector('textarea').value = '';
+                    } else {
+                        alert('Erro ao adicionar comentário.');
+                    }
+                })
+                .catch(error => console.error('Erro:', error));
+        }
+
+        function abrirModalEditarComentario(comentarioId, conteudoAtual) {
+            const modalEditarComentario = new bootstrap.Modal(document.getElementById('modalEditarComentario'));
+            modalEditarComentario.show();
+
+            document.getElementById('novoConteudoComentario').value = conteudoAtual;
+
+            document.getElementById('salvarEdicaoComentario').onclick = function () {
+                const novoConteudo = document.getElementById('novoConteudoComentario').value.trim();
+
+                if (novoConteudo) {
+                    fetch('serviços/comentarios/editar_comentario.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `comentario_id=${comentarioId}&novo_texto=${encodeURIComponent(novoConteudo)}`
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Comentário atualizado com sucesso!');
+                                modalEditarComentario.hide();
+                                location.reload();
+                            } else {
+                                alert(data.message || 'Erro ao atualizar o comentário.');
+                            }
+                        })
+                        .catch(error => console.error('Erro ao atualizar o comentário:', error));
+                } else {
+                    alert('O conteúdo do comentário não pode estar vazio.');
+                }
+            };
+        }
+
+        function abrirModalDeletarComentario(comentarioId) {
+            const modalConfirmacaoDelete = new bootstrap.Modal(document.getElementById('modalConfirmacaoDelete'));
+            modalConfirmacaoDelete.show();
+
+            document.getElementById('confirmarDeletar').onclick = function () {
+                fetch('serviços/comentarios/deletar_comentario.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `comentario_id=${comentarioId}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.message || 'Erro ao deletar o comentário.');
+                        }
+                    })
+                    .catch(error => console.error('Erro ao deletar comentário:', error));
+            };
         }
 
         function addComment(postId) {
             const commentText = document.getElementById('novoComentario').value.trim();
             if (commentText) {
-                fetch('adicionar_comentario.php', {
+                fetch('serviços/comentarios/adicionar_comentario.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `post_id=${postId}&content=${encodeURIComponent(commentText)}`
@@ -308,10 +423,8 @@ if ($posts === false) {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Limpar campo de comentário
                             document.getElementById('novoComentario').value = '';
-                            // Recarregar os comentários
-                            openPostModal(postId, data.image, data.description); // Recarrega o modal com novos comentários
+                            openPostModal(postId, data.image, data.description);
                         } else {
                             alert('Erro ao adicionar comentário.');
                         }
@@ -322,7 +435,6 @@ if ($posts === false) {
                     });
             }
         }
-
     </script>
 
     <script src="bootstrap-5.3.3-dist/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
