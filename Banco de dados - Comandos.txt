@@ -1,0 +1,193 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Tempo de geração: 03/12/2024 às 17:36
+-- Versão do servidor: 10.4.32-MariaDB
+-- Versão do PHP: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Banco de dados: `sistema_web`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `comments`
+--
+
+CREATE TABLE `comments` (
+  `id` int(11) NOT NULL,
+  `post_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `content` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `comments`
+--
+
+INSERT INTO `comments` (`id`, `post_id`, `user_id`, `content`, `created_at`) VALUES
+(27, 31, 9, 'Sem duvidas!!', '2024-12-03 14:45:25'),
+(28, 31, 9, 'Sem duvidas!!', '2024-12-03 14:45:36'),
+(29, 33, 10, 'Bacana!', '2024-12-03 14:48:14'),
+(30, 32, 10, 'Bem vindo Silvio!', '2024-12-03 14:48:34'),
+(34, 32, 10, 'Jonas aprova!', '2024-12-03 14:58:31'),
+(35, 33, 10, 'Legal!', '2024-12-03 14:59:32'),
+(40, 36, 10, 'uauu', '2024-12-03 16:05:56');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `perfil`
+--
+
+CREATE TABLE `perfil` (
+  `usuario_id` int(11) NOT NULL,
+  `total_posts` int(11) DEFAULT 0,
+  `total_likes` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `posts`
+--
+
+CREATE TABLE `posts` (
+  `id` int(11) NOT NULL,
+  `usuario_id` int(11) NOT NULL,
+  `imagem` varchar(255) DEFAULT NULL,
+  `descricao` text DEFAULT NULL,
+  `data_criacao` timestamp NOT NULL DEFAULT current_timestamp(),
+  `curtidas` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `posts`
+--
+
+INSERT INTO `posts` (`id`, `usuario_id`, `imagem`, `descricao`, `data_criacao`, `curtidas`) VALUES
+(31, 8, 'uploads/O Maior.jpg', 'O MAIOR!!', '2024-12-03 14:43:53', 16),
+(32, 9, 'uploads/Cidade.jpg', 'Chegando em São Paulo!!', '2024-12-03 14:45:13', 7),
+(33, 9, 'uploads/Belo tigre.jpg', 'Que belo animal!', '2024-12-03 14:46:22', 3),
+(36, 10, 'uploads/Bela paisagem.jpg', 'jjjj', '2024-12-03 16:05:50', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL,
+  `nome` varchar(100) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `data_criacao` timestamp NOT NULL DEFAULT current_timestamp(),
+  `bio` text DEFAULT NULL,
+  `imagem_perfil` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios`
+--
+
+INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `data_criacao`, `bio`, `imagem_perfil`) VALUES
+(8, 'Cristiano', 'Lucas@gmail.com', '$2y$10$smXFYVoQhenC.rrs90bcG.hFhg4wZsQkhPDOc1CxLwyUJfCf37Fii', '2024-12-03 14:38:02', 'SIIIIIUUU!!', 'uploads/Cristiano.jpg'),
+(9, 'Silvio Santos', 'Silvio@gmail.com', '$2y$10$B4PF/HrSfOeI1lMzSR95dukwXG2baUlifVqE6vVeerOYgSzwJ7.dK', '2024-12-03 14:44:20', 'MAAOOOIII! OLHA O AVIÃOZINHO!!', 'uploads/Silvio.jpg'),
+(10, 'Jonas', 'Jonas@gmail.com', '$2y$10$O7AULda0.KSU4LlUi9F89es/0c3AU1.GQ8oE0rV64VZhKTysdF4ZC', '2024-12-03 14:47:09', 'EU SOU O JONAS', 'uploads/Paulo_perfil.jpg');
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `post_id` (`post_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Índices de tabela `perfil`
+--
+ALTER TABLE `perfil`
+  ADD PRIMARY KEY (`usuario_id`);
+
+--
+-- Índices de tabela `posts`
+--
+ALTER TABLE `posts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario_id` (`usuario_id`);
+
+--
+-- Índices de tabela `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+
+--
+-- AUTO_INCREMENT de tabela `posts`
+--
+ALTER TABLE `posts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- Restrições para tabelas despejadas
+--
+
+--
+-- Restrições para tabelas `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `perfil`
+--
+ALTER TABLE `perfil`
+  ADD CONSTRAINT `perfil_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `posts`
+--
+ALTER TABLE `posts`
+  ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
